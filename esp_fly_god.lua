@@ -1,4 +1,3 @@
--- ESP cho zombie
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local localPlayer = Players.LocalPlayer
@@ -42,35 +41,58 @@ spawn(function()
         wait(1)
     end
 end) 
--- Bay khi giữ phím Space
-local UIS = game:GetService("UserInputService")
-local Players = game:GetService("Players")
-local player = Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-local root = character:WaitForChild("HumanoidRootPart")
 
-local flying = false
-
--- Dành cho mobile: dùng nút nhảy ảo hoặc nhấn giữ nút Jump
-UIS.JumpRequest:Connect(function()
-    flying = true
-    while flying do
-        root.Velocity = Vector3.new(0, 50, 0)
-        task.wait()
-    end
-end)
-
-UIS.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.Touch or input.KeyCode == Enum.KeyCode.Space then
-        flying = false
-    end
-end)
 -- God Mode
 spawn(function()
     while wait(0.5) do
         local char = player.Character
         if char and char:FindFirstChild("Humanoid") then
             char.Humanoid.Health = char.Humanoid.MaxHealth
+        end
+    end
+end)
+-- 1. Auto hồi sinh
+game:GetService("Players").LocalPlayer.CharacterAdded:Connect(function(char)
+    print("Auto respawn kích hoạt")
+end)
+
+-- 2. 1 hit kill zombie
+spawn(function()
+    while true do
+        local zombies = workspace:FindFirstChild("Zombies")
+        if zombies then
+            for _, z in pairs(zombies:GetChildren()) do
+                local hum = z:FindFirstChildOfClass("Humanoid")
+                if hum and hum.Health > 0 then
+                    hum.Health = 0
+                end
+            end
+        end
+        wait(0.5)
+    end
+end)
+
+-- 3. Tăng tốc độ khi chạy
+local UIS = game:GetService("UserInputService")
+local player = game:GetService("Players").LocalPlayer
+local human = player.Character and player.Character:WaitForChild("Humanoid")
+
+local running = false
+
+UIS.InputBegan:Connect(function(input, gp)
+    if input.KeyCode == Enum.KeyCode.LeftShift or input.UserInputType == Enum.UserInputType.Touch then
+        running = true
+        if human then
+            human.WalkSpeed = 100 -- tốc độ chạy
+        end
+    end
+end)
+
+UIS.InputEnded:Connect(function(input, gp)
+    if input.KeyCode == Enum.KeyCode.LeftShift or input.UserInputType == Enum.UserInputType.Touch then
+        running = false
+        if human then
+            human.WalkSpeed = 16 -- về lại tốc độ bình thường
         end
     end
 end)
