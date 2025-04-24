@@ -7,8 +7,7 @@ spawn(function()
                 esp.Name = "ESP"
                 esp.Size = UDim2.new(0, 100, 0, 40)
                 esp.AlwaysOnTop = true
-                esp.StudsOffset = Vector3.new(0, 2, 0) 
-local label = Instance.new("TextLabel", esp)
+                esp.StudsOffset = Vector3.new(0, 2, 0) local label = Instance.new("TextLabel", esp)
                 label.Size = UDim2.new(1, 0, 1, 0)
                 label.BackgroundTransparency = 1
                 label.Text = "ZOMBIE"
@@ -20,8 +19,7 @@ local label = Instance.new("TextLabel", esp)
             end
         end
     end
-end)
-
+end) 
 -- Bay khi giữ phím Space
 local UIS = game:GetService("UserInputService")
 local player = game.Players.LocalPlayer
