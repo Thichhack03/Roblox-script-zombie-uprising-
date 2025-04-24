@@ -51,10 +51,6 @@ spawn(function()
         end
     end
 end)
--- 1. Auto hồi sinh
-game:GetService("Players").LocalPlayer.CharacterAdded:Connect(function(char)
-    print("Auto respawn kích hoạt")
-end)
 
 -- 2. 1 hit kill zombie
 spawn(function()
@@ -63,36 +59,11 @@ spawn(function()
         if zombies then
             for _, z in pairs(zombies:GetChildren()) do
                 local hum = z:FindFirstChildOfClass("Humanoid")
-                if hum and hum.Health > 0 then
-                    hum.Health = 0
+                if hum and hum.Health > 1 then
+                    hum.Health = 1
                 end
             end
         end
         wait(0.5)
-    end
-end)
-
--- 3. Tăng tốc độ khi chạy
-local UIS = game:GetService("UserInputService")
-local player = game:GetService("Players").LocalPlayer
-local human = player.Character and player.Character:WaitForChild("Humanoid")
-
-local running = false
-
-UIS.InputBegan:Connect(function(input, gp)
-    if input.KeyCode == Enum.KeyCode.LeftShift or input.UserInputType == Enum.UserInputType.Touch then
-        running = true
-        if human then
-            human.WalkSpeed = 100 -- tốc độ chạy
-        end
-    end
-end)
-
-UIS.InputEnded:Connect(function(input, gp)
-    if input.KeyCode == Enum.KeyCode.LeftShift or input.UserInputType == Enum.UserInputType.Touch then
-        running = false
-        if human then
-            human.WalkSpeed = 16 -- về lại tốc độ bình thường
-        end
     end
 end)
