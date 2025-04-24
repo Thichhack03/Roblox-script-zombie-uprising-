@@ -1,47 +1,70 @@
 -- ESP cho zombie
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local localPlayer = Players.LocalPlayer
+
+function createHighlight(target, color)
+    if target:FindFirstChild("Highlight") then return end
+
+    local highlight = Instance.new("Highlight")
+    highlight.Name = "Highlight"
+    highlight.FillColor = color
+    highlight.OutlineColor = Color3.new(0, 0, 0)
+    highlight.OutlineTransparency = 0
+    highlight.FillTransparency = 0.3
+    highlight.Adornee = target
+    highlight.Parent = target
+end
+
+-- ESP Zombie (đỏ)
 spawn(function()
-    while wait(1) do
-        for _, zombie in pairs(game:GetService("Workspace").Zombies:GetChildren()) do
-            if zombie:FindFirstChild("Head") and not zombie.Head:FindFirstChild("ESP") then
-                local esp = Instance.new("BillboardGui", zombie.Head)
-                esp.Name = "ESP"
-                esp.Size = UDim2.new(0, 100, 0, 40)
-                esp.AlwaysOnTop = true
-                esp.StudsOffset = Vector3.new(0, 2, 0) local label = Instance.new("TextLabel", esp)
-                label.Size = UDim2.new(1, 0, 1, 0)
-                label.BackgroundTransparency = 1
-                label.Text = "ZOMBIE"
-                label.TextColor3 = Color3.new(1, 0, 0)
-                label.TextStrokeColor3 = Color3.new(0, 0, 0)
-                label.TextStrokeTransparency = 0
-                label.Font = Enum.Font.SourceSansBold
-                label.TextScaled = true
+    while true do
+        local zombiesFolder = workspace:FindFirstChild("Zombies")
+        if zombiesFolder then
+            for _, zombie in pairs(zombiesFolder:GetChildren()) do
+                if zombie:IsA("Model") and zombie:FindFirstChild("HumanoidRootPart") then
+                    createHighlight(zombie, Color3.new(1, 0, 0)) -- màu đỏ
+                end
             end
         end
+        wait(1)
+    end
+end)
+
+-- ESP đồng minh (xanh dương)
+spawn(function()
+    while true do
+        for _, plr in pairs(Players:GetPlayers()) do
+            if plr ~= localPlayer and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+                createHighlight(plr.Character, Color3.new(0, 0.5, 1)) -- màu xanh lam
+            end
+        end
+        wait(1)
     end
 end) 
 -- Bay khi giữ phím Space
 local UIS = game:GetService("UserInputService")
-local player = game.Players.LocalPlayer
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
 local root = character:WaitForChild("HumanoidRootPart")
+
 local flying = false
-UIS.InputBegan:Connect(function(input)
-    if input.KeyCode == Enum.KeyCode.Space then
-        flying = true
-        while flying do
-            root.Velocity = Vector3.new(0, 50, 0)
-            wait()
-        end
+
+-- Dành cho mobile: dùng nút nhảy ảo hoặc nhấn giữ nút Jump
+UIS.JumpRequest:Connect(function()
+    flying = true
+    while flying do
+        root.Velocity = Vector3.new(0, 50, 0)
+        task.wait()
     end
 end)
 
 UIS.InputEnded:Connect(function(input)
-    if input.KeyCode == Enum.KeyCode.Space then
+    if input.UserInputType == Enum.UserInputType.Touch or input.KeyCode == Enum.KeyCode.Space then
         flying = false
     end
 end)
-
 -- God Mode
 spawn(function()
     while wait(0.5) do
