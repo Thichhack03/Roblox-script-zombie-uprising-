@@ -51,19 +51,3 @@ spawn(function()
         end
     end
 end)
-
--- 2. 1 hit kill zombie
-spawn(function()
-    while true do
-        local zombies = workspace:FindFirstChild("Zombies")
-        if zombies then
-            for _, z in pairs(zombies:GetChildren()) do
-                local hum = z:FindFirstChildOfClass("Humanoid")
-                if hum and hum.Health > 1 then
-                    hum.Health = 1
-                end
-            end
-        end
-        wait(0.5)
-    end
-end)
