@@ -52,31 +52,26 @@ spawn(function()
     end
 end)
 
--- Kill aura --
-local killAuraRadius = 10 -- Tầm của Kill Aura
-local player = game.Players.LocalPlayer -- Lấy người chơi
-local character = player.Character or player.CharacterAdded:Wait() -- Lấy nhân vật của người chơi
-local humanoid = character:WaitForChild("Humanoid") -- Lấy đối tượng Humanoid của nhân vật
+-- Noclip --
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local player = Players.LocalPlayer
 
--- Hàm kiểm tra quái vật trong phạm vi và tiêu diệt chúng
-local function killNearbyZombies()
-    -- Duyệt qua tất cả các đối tượng trong game
-    for _, obj in pairs(workspace:GetChildren()) do
-        if obj:IsA("Model") and obj:FindFirstChild("Humanoid") and obj:FindFirstChild("ZombieTag") then -- Kiểm tra nếu là quái vật
-            local zombie = obj
-            local distance = (zombie.HumanoidRootPart.Position - character.HumanoidRootPart.Position).magnitude -- Tính khoảng cách giữa người chơi và zombie
-            if distance <= killAuraRadius then -- Nếu zombie trong phạm vi kill aura
-                local zombieHumanoid = zombie:FindFirstChild("Humanoid")
-                if zombieHumanoid then
-                    zombieHumanoid.Health = 0 -- Giết zombie
-                end
-            end
+-- Đợi đến khi nhân vật được load
+local function getChar()
+    return player.Character or player.CharacterAdded:Wait()
+end
+
+-- Noclip bằng cách dùng PlatformStand (tránh bị server "snap" về)
+getChar():WaitForChild("Humanoid").PlatformStand = true
+
+-- CanCollide false liên tục
+RunService.Stepped:Connect(function()
+    local char = getChar()
+    for _, part in pairs(char:GetDescendants()) do
+        if part:IsA("BasePart") then
+            part.CanCollide = false
+            part.Velocity = Vector3.new(0,0,0) -- Giảm snap
         end
     end
-end
-
--- Tạo một vòng lặp để kiểm tra liên tục
-while true do
-    wait(1) -- Mỗi giây kiểm tra
-    killNearbyZombies()
-end
+end)
