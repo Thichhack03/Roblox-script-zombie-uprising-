@@ -51,3 +51,60 @@ spawn(function()
         end
     end
 end)
+
+-- Noclip (giữ phím "N" để bật/tắt hoặc luôn bật nếu dùng mobile)
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local player = Players.LocalPlayer
+
+local noclipEnabled = true -- Đặt true để luôn bật, false nếu muốn nút bật/tắt
+
+-- Nếu dùng PC và muốn toggle bằng phím N
+game:GetService("UserInputService").InputBegan:Connect(function(input, gp)
+    if input.KeyCode == Enum.KeyCode.N then
+        noclipEnabled = not noclipEnabled
+        print("Noclip: ", noclipEnabled)
+    end
+end)
+
+-- Cập nhật trạng thái noclip liên tục
+RunService.Stepped:Connect(function()
+    if noclipEnabled and player.Character then
+        for _, part in pairs(player.Character:GetDescendants()) do
+            if part:IsA("BasePart") and part.CanCollide == true then
+                part.CanCollide = false
+            end
+        end
+    end
+end)
+
+-- Thêm tiền vào hệ thống có sẵn (giả sử tên là "Cash" hoặc "Money")
+local player = game.Players.LocalPlayer
+
+spawn(function()
+    while true do
+        local zombies = workspace:FindFirstChild("Zombies")
+        if zombies then
+            for _, z in pairs(zombies:GetChildren()) do
+                local hum = z:FindFirstChildOfClass("Humanoid")
+                if hum and hum.Health > 0 and not z:FindFirstChild("CoinTag") then
+                    -- Gắn tag để không xử lý lại
+                    local tag = Instance.new("BoolValue", z)
+                    tag.Name = "CoinTag"
+
+                    hum.Died:Connect(function()
+                        local stats = player:FindFirstChild("leaderstats")
+                        if stats then
+                            local cash = stats:FindFirstChild("Cash") or stats:FindFirstChild("Money") or stats:FindFirstChild("Coins")
+                            if cash then
+                                cash.Value = cash.Value + 1000 -- +$1000 vào hệ thống game
+                                print("Nhận $1000! Tổng tiền: $"..cash.Value)
+                            end
+                        end
+                    end)
+                end
+            end
+        end
+        wait(1)
+    end
+end)
