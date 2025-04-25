@@ -44,34 +44,10 @@ end)
 
 -- God Mode
 spawn(function()
-    while wait(0.5) do
+    while wait(0.1) do
         local char = player.Character
         if char and char:FindFirstChild("Humanoid") then
             char.Humanoid.Health = char.Humanoid.MaxHealth
-        end
-    end
-end)
-
--- Noclip --
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local player = Players.LocalPlayer
-
--- Đợi đến khi nhân vật được load
-local function getChar()
-    return player.Character or player.CharacterAdded:Wait()
-end
-
--- Noclip bằng cách dùng PlatformStand (tránh bị server "snap" về)
-getChar():WaitForChild("Humanoid").PlatformStand = true
-
--- CanCollide false liên tục
-RunService.Stepped:Connect(function()
-    local char = getChar()
-    for _, part in pairs(char:GetDescendants()) do
-        if part:IsA("BasePart") then
-            part.CanCollide = false
-            part.Velocity = Vector3.new(0,0,0) -- Giảm snap
         end
     end
 end)
