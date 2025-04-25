@@ -42,12 +42,29 @@ spawn(function()
     end
 end) 
 
--- God Mode
-spawn(function()
-    while wait(0.1) do
-        local char = player.Character
-        if char and char:FindFirstChild("Humanoid") then
-            char.Humanoid.Health = char.Humanoid.MaxHealth
+-- God mode --
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+-- Hàm theo dõi và hồi máu liên tục
+local function godMode()
+    while true do
+        local char = player.Character or player.CharacterAdded:Wait()
+        local hum = char:FindFirstChildOfClass("Humanoid")
+        if hum then
+            if hum.Health < hum.MaxHealth then
+                hum.Health = hum.MaxHealth
+            end
         end
+        wait(0.1)
     end
+end
+
+-- Gọi lại God Mode mỗi khi chết hoặc reset
+player.CharacterAdded:Connect(function()
+    wait(1) -- đợi character load đầy đủ
+    spawn(godMode)
 end)
+
+-- Khởi động lần đầu
+spawn(godMode)
