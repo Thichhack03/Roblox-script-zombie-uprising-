@@ -51,3 +51,32 @@ spawn(function()
         end
     end
 end)
+
+-- Kill aura --
+local killAuraRadius = 10 -- Tầm của Kill Aura
+local player = game.Players.LocalPlayer -- Lấy người chơi
+local character = player.Character or player.CharacterAdded:Wait() -- Lấy nhân vật của người chơi
+local humanoid = character:WaitForChild("Humanoid") -- Lấy đối tượng Humanoid của nhân vật
+
+-- Hàm kiểm tra quái vật trong phạm vi và tiêu diệt chúng
+local function killNearbyZombies()
+    -- Duyệt qua tất cả các đối tượng trong game
+    for _, obj in pairs(workspace:GetChildren()) do
+        if obj:IsA("Model") and obj:FindFirstChild("Humanoid") and obj:FindFirstChild("ZombieTag") then -- Kiểm tra nếu là quái vật
+            local zombie = obj
+            local distance = (zombie.HumanoidRootPart.Position - character.HumanoidRootPart.Position).magnitude -- Tính khoảng cách giữa người chơi và zombie
+            if distance <= killAuraRadius then -- Nếu zombie trong phạm vi kill aura
+                local zombieHumanoid = zombie:FindFirstChild("Humanoid")
+                if zombieHumanoid then
+                    zombieHumanoid.Health = 0 -- Giết zombie
+                end
+            end
+        end
+    end
+end
+
+-- Tạo một vòng lặp để kiểm tra liên tục
+while true do
+    wait(1) -- Mỗi giây kiểm tra
+    killNearbyZombies()
+end
