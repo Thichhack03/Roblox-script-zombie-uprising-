@@ -16,19 +16,29 @@ function createHighlight(target, color)
 end
 
 -- ESP Zombie (đỏ)
-spawn(function()
-    while true do
-        local zombiesFolder = workspace:FindFirstChild("Zombies")
-        if zombiesFolder then
-            for _, zombie in pairs(zombiesFolder:GetChildren()) do
-                if zombie:IsA("Model") and zombie:FindFirstChild("HumanoidRootPart") then
-                    createHighlight(zombie, Color3.new(1, 0, 0)) -- màu đỏ
-                end
-            end
+local function highlightModel(model, color)
+    local h = Instance.new("Highlight")
+    h.FillColor = color
+    h.OutlineTransparency = 1
+    h.FillTransparency = 0
+    h.Parent = model
+end
+
+local function isZombie(model)
+    return model:IsA("Model") and model:FindFirstChildOfClass("Humanoid") and not model:FindFirstChild("AlreadyESP")
+end
+
+while true do
+    for _, obj in pairs(workspace:GetDescendants()) do
+        if isZombie(obj) then
+            local tag = Instance.new("BoolValue", obj)
+            tag.Name = "AlreadyESP"
+            tag.Parent = obj
+            highlightModel(obj, Color3.fromRGB(255, 0, 0)) -- đỏ toàn thân
         end
-        wait(1)
     end
-end)
+    wait(1)
+end
 
 -- ESP đồng minh (xanh dương)
 spawn(function()
